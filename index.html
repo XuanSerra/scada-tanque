@@ -49,14 +49,14 @@
         .pump-icon {
             width: 40px;
             height: 40px;
-            background-color: white; /* Fondo blanco por defecto */
-            border-radius: 50%; /* Forma circular para simular una bomba */
+            background-color: transparent; /* Sin fondo para mostrar el icono SVG claramente */
             position: absolute;
             bottom: 5px; /* Colocar el icono cerca de la base del tubo */
             left: 50%;
             transform: translateX(-50%);
             background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v-2h-2v2zm0-4h2V7h-2v5z"/></svg>');
-            background-size: cover;
+            background-size: contain;
+            background-repeat: no-repeat;
         }
         .well {
             width: 100px;
