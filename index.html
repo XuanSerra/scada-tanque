@@ -18,36 +18,32 @@
             text-align: center;
         }
         .tank {
-            width: 400px; /* Más ancho para un tanque horizontal */
-            height: 200px; /* Más bajo para un tanque horizontal */
+            width: 400px;
+            height: 200px;
             border: 2px solid #333;
             border-radius: 10px;
             position: relative;
             background-color: #ddd;
             margin: 20px auto;
-            display: block;
+            display: inline-block;
+            vertical-align: middle;
         }
         .water {
-            width: 0%; /* Cambiado a width para un tanque horizontal */
             height: 100%;
+            width: 50%; /* Nivel inicial del 50%, de izquierda a derecha */
             position: absolute;
             left: 0;
             background-color: gray; /* Color gris temporal */
             transition: width 0.5s ease;
         }
-        .pipe {
+        .pipe-pump {
             width: 50px;
-            height: 100px;
+            height: 150px; /* Combina tubo y bomba en un solo elemento */
             border: 2px solid #333;
             margin: 20px auto;
-            background-color: white; /* Tubería blanca por defecto */
-        }
-        .pump {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin: 20px auto;
-            background-color: white; /* Bomba STOP (blanco) por defecto */
+            background-color: white; /* Tubo y bomba blancos por defecto */
+            display: inline-block;
+            vertical-align: middle;
         }
         .well {
             width: 100px;
@@ -55,6 +51,8 @@
             border: 2px solid #333;
             margin: 20px auto;
             background-color: lightblue; /* POZO1 al 50%, azul claro */
+            display: inline-block;
+            vertical-align: middle;
         }
         .info {
             margin-top: 20px;
@@ -63,15 +61,14 @@
         .slider-container {
             margin-left: 20px;
             display: inline-block;
-            vertical-align: top;
+            vertical-align: middle;
         }
         .slider {
             width: 400px; /* Slider horizontal para mejor manejo */
             height: 20px;
-            margin-top: 20px;
         }
         button {
-            margin: 10px;
+            margin: 5px;
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
@@ -82,19 +79,21 @@
     <div class="container">
         <h2>Depósito 1 - Capacidad total 443,73 m³</h2>
         <div class="tank">
-            <div class="water" id="water-level" style="width: 50%;"></div> <!-- Nivel inicial del 50% -->
+            <div class="water" id="water-level"></div> <!-- Nivel inicial del 50% -->
+        </div>
+        <div class="slider-container">
+            <input type="range" class="slider" id="level-slider" min="0" max="443730" value="221865">
         </div>
         <div class="info">
             <p>Litros actuales: <span id="liters">221865</span> litros</p>
             <p>M³ actuales: <span id="m3">221,865</span> m³</p>
+            <p>Nº de semana actual: <span id="week-number"></span> - Periodo: <span id="period"></span></p>
+            <p>Contador ON/OFF Bomba: <span id="pump-counter">0</span></p>
         </div>
-        <div class="pipe"></div>
-        <div class="pump" id="pump-status"></div>
+        <div class="pipe-pump" id="pipe-pump"></div>
         <div class="well" id="well-status"></div>
-        <div class="slider-container">
-            <input type="range" class="slider" id="level-slider" min="0" max="443730" value="221865">
-        </div>
-        <button id="pump-toggle">Simular Bomba ON/OFF</button>
+        <button id="pump-toggle">Simular Bomba ON</button>
+        <button id="reset-counter">Reset Contador</button>
     </div>
 
     <script>
@@ -103,36 +102,6 @@
         const litersDisplay = document.getElementById("liters");
         const m3Display = document.getElementById("m3");
         const slider = document.getElementById("level-slider");
-        const pump = document.getElementById("pump-status");
+        const pipePump = document.getElementById("pipe-pump");
         const pumpToggle = document.getElementById("pump-toggle");
-
-        // Actualizar el nivel del tanque y los valores según el slider
-        slider.addEventListener("input", function() {
-            const liters = parseInt(slider.value);
-            const percentage = (liters / totalLiters) * 100;
-            tank.style.width = percentage + "%";
-            litersDisplay.textContent = liters;
-            m3Display.textContent = (liters / 1000).toFixed(3); // Convertir litros a m³
-        });
-
-        // Simular ON/OFF de la bomba
-        let pumpOn = false;
-        pumpToggle.addEventListener("click", function() {
-            pumpOn = !pumpOn;
-            if (pumpOn) {
-                pump.style.backgroundColor = "green"; // Bomba en marcha (verde)
-                pumpToggle.textContent = "Simular Bomba OFF";
-            } else {
-                pump.style.backgroundColor = "white"; // Bomba STOP (blanco)
-                pumpToggle.textContent = "Simular Bomba ON";
-            }
-        });
-
-        // Inicializar el tanque al 50%
-        slider.value = 221865;
-        slider.dispatchEvent(new Event("input"));
-        pump.style.backgroundColor = "white"; // Bomba inicial en STOP
-        pumpToggle.textContent = "Simular Bomba ON";
-    </script>
-</body>
-</html>
+        const pumpCounterDisplay = document.get
