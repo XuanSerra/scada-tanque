@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinóptico SCADA - Depósito 1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+        }
+        .tank {
+            width: 200px;
+            height: 400px;
+            border: 2px solid #333;
+            border-radius: 10px;
+            position: relative;
+            background-color: #ddd;
+            margin: 20px;
+            display: inline-block;
+        }
+        .water {
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            background-color: gray; /* Color temporal, lo cambiaremos según el nivel */
+            transition: height 0.5s ease;
+        }
+        .pipe {
+            width: 50px;
+            height: 100px;
+            border: 2px solid #333;
+            margin: 20px auto;
+            background-color: white; /* Inicialmente blanco */
+        }
+        .pump {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 20px auto;
+            background-color: white; /* Inicialmente blanco */
+        }
+        .well {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #333;
+            margin: 20px auto;
+            background-color: lightblue; /* 50% de nivel, azul claro */
+        }
+        .info {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .slider-container {
+            margin-left: 20px;
+            display: inline-block;
+            vertical-align: top;
+        }
+        .slider {
+            width: 100px;
+            height: 400px;
+            transform: rotate(270deg);
+            margin-top: -200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Depósito 1 - Capacidad total 443,73 m³</h2>
+        <div class="tank">
+            <div class="water" id="water-level" style="height: 50%;"></div> <!-- Nivel inicial del 50% -->
+        </div>
+        <div class="info">
+            <p>Litros actuales: <span id="liters">221865</span> litros</p>
+            <p>M³ actuales: <span id="m3">221,865</span> m³</p>
+        </div>
+        <div class="pipe"></div>
+        <div class="pump" id="pump-status"></div>
+        <div class="well" id="well-status"></div>
+        <div class="slider-container">
+            <input type="range" class="slider" id="level-slider" min="0" max="100" value="50">
+        </div>
+    </div>
+</body>
+</html>
