@@ -79,12 +79,17 @@
         .slider {
             width: 400px; /* Slider horizontal para mejor manejo */
             height: 20px;
+            -webkit-appearance: slider-horizontal; /* Asegurar compatibilidad en navegadores */
+            appearance: slider-horizontal;
         }
         button {
             margin: 5px;
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
+        }
+        .controls {
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -107,8 +112,10 @@
             <div class="pump-icon" id="pump-icon"></div>
         </div>
         <div class="well" id="well-status"></div>
-        <button id="pump-toggle">Simular Bomba ON</button>
-        <button id="reset-counter">Reset Contador</button>
+        <div class="controls">
+            <button id="pump-toggle">Simular Bomba ON</button>
+            <button id="reset-counter">Reset Contador</button>
+        </div>
     </div>
 
     <script>
