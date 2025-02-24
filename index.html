@@ -104,4 +104,63 @@
         const slider = document.getElementById("level-slider");
         const pipePump = document.getElementById("pipe-pump");
         const pumpToggle = document.getElementById("pump-toggle");
-        const pumpCounterDisplay = document.get
+        const pumpCounterDisplay = document.getElementById("pump-counter");
+        const resetCounter = document.getElementById("reset-counter");
+        const weekNumberDisplay = document.getElementById("week-number");
+        const periodDisplay = document.getElementById("period");
+
+        // Inicializar el número de semana y periodo (hoy, 24 de febrero de 2025)
+        const today = new Date();
+        const weekNumber = getWeekNumber(today);
+        const period = today.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+        weekNumberDisplay.textContent = weekNumber;
+        periodDisplay.textContent = period;
+
+        function getWeekNumber(d) {
+            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return weekNo;
+        }
+
+        // Actualizar el nivel del tanque y los valores según el slider
+        slider.addEventListener("input", function() {
+            const liters = parseInt(slider.value);
+            const percentage = (liters / totalLiters) * 100;
+            tank.style.width = percentage + "%";
+            litersDisplay.textContent = liters;
+            m3Display.textContent = (liters / 1000).toFixed(3); // Convertir litros a m³
+        });
+
+        // Simular ON/OFF de la bomba y contar veces
+        let pumpOn = false;
+        let pumpCounter = 0;
+        pumpToggle.addEventListener("click", function() {
+            pumpOn = !pumpOn;
+            if (pumpOn) {
+                pipePump.style.backgroundColor = "green"; // Tubo y bomba ON (verde)
+                pumpToggle.textContent = "Simular Bomba OFF";
+            } else {
+                pipePump.style.backgroundColor = "white"; // Tubo y bomba STOP (blanco)
+                pumpToggle.textContent = "Simular Bomba ON";
+            }
+            pumpCounter++;
+            pumpCounterDisplay.textContent = pumpCounter;
+        });
+
+        // Resetear contador de ON/OFF
+        resetCounter.addEventListener("click", function() {
+            pumpCounter = 0;
+            pumpCounterDisplay.textContent = pumpCounter;
+        });
+
+        // Inicializar el tanque al 50%
+        slider.value = 221865;
+        slider.dispatchEvent(new Event("input"));
+        pipePump.style.backgroundColor = "white"; // Tubo y bomba iniciales en STOP
+        pumpToggle.textContent = "Simular Bomba ON";
+        pumpCounterDisplay.textContent = pumpCounter;
+    </script>
+</body>
+</html>
