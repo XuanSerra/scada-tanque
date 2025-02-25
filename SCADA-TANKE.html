@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCADA-TANKE: Depósito 1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px;
+        }
+        .data, .controls {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .config {
+            margin-top: 20px;
+        }
+        #teclasSimulacion {
+            margin-top: 10px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>SCADA-TANKE: Depósito 1</h1>
+    <div class="container">
+        <div class="data">
+            <h2>Datos en Tiempo Real</h2>
+            <p>Nivel del tanque: <span id="nivel">0%</span></p>
+            <p>Temperatura: <span id="temperatura">0°C</span></p>
+            <p>Estado de la bomba: <span id="bomba">Apagada</span></p>
+        </div>
+        <div class="controls">
+            <h2>Controles</h2>
+            <button onclick="toggleBomba()">Encender/Apagar Bomba</button>
+            <div class="config">
+                <h3>Configuración</h3>
+                <label><input type="checkbox" id="mostrarTeclas" checked> Mostrar teclas de simulación</label>
+                <div id="teclasSimulacion">Teclas: [W: Subir nivel, S: Bajar nivel]</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let nivel = 50; // Nivel inicial del tanque (0-100%)
+        let temperatura = 25; // Temperatura inicial
+        let bombaEncendida = false;
+
+        function actualizarDatos() {
+            nivel += Math.random() * 2 - 1; // Simula variación del nivel
+            if (nivel < 0) nivel = 0;
+            if (nivel > 100) nivel = 100;
+
+            temperatura += Math.random() * 0.5 - 0.25; // Simula variación de temperatura
+            if (temperatura < 0) temperatura = 0;
+
+            document.getElementById("nivel").textContent = nivel.toFixed(1) + "%";
+            document.getElementById("temperatura").textContent = temperatura.toFixed(1) + "°C";
+            document.getElementById("bomba").textContent = bombaEncendida ? "Encendida" : "Apagada";
+        }
+
+        function toggleBomba() {
+            bombaEncendida = !bombaEncendida;
+            actualizarDatos();
+        }
+
+        // Control del checkbox para mostrar/ocultar teclas
+        const checkbox = document.getElementById("mostrarTeclas");
+        const teclasSimulacion = document.getElementById("teclasSimulacion");
+
+        function actualizarVisibilidadTeclas() {
+            if (checkbox.checked) {
+                teclasSimulacion.style.display = "block"; // Mostrar cuando está tildado
+            } else {
+                teclasSimulacion.style.display = "none"; // Ocultar cuando no está tildado
+            }
+        }
+
+        // Escuchar cambios en el checkbox
+        checkbox.addEventListener("change", actualizarVisibilidadTeclas);
+
+        // Control de teclas W y S para simular nivel
+        document.addEventListener("keydown", (event) => {
+            if (checkbox.checked) { // Solo funciona si las teclas están habilitadas
+                if (event.key === "w" || event.key === "W") {
+                    nivel += 5;
+                    if (nivel > 100) nivel = 100;
+                    actualizarDatos();
+                } else if (event.key === "s" || event.key === "S") {
+                    nivel -= 5;
+                    if (nivel < 0) nivel = 0;
+                    actualizarDatos();
+                }
+            }
+        });
+
+        // Inicializar
+        setInterval(actualizarDatos, 2000);
+        actualizarDatos();
+        actualizarVisibilidadTeclas(); // Aplicar estado inicial del checkbox
+    </script>
+</body>
+</html>
