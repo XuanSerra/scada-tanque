@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>scada-tanque - Depósito 1</title>
+    <title>scada-tanque - Bomba y Depósito</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -25,6 +25,36 @@
             align-items: center;
             gap: 20px;
         }
+        .pump {
+            width: 80px; /* Ancho basado en el círculo */
+            height: 205px; /* Altura total: círculo (80px) + rectángulo (125px) */
+            margin: 10px 0;
+            position: relative;
+            display: inline-block;
+        }
+        .pump-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            background-color: gray; /* Color inicial gris para "OFF" */
+        }
+        .pump-rectangle {
+            width: 15px;
+            height: 125px;
+            position: absolute;
+            top: 0;
+            left: 32.5px; /* Centrado horizontalmente (80px / 2 - 15px / 2) */
+            background-color: white; /* Color inicial blanco para "OFF" */
+        }
+        .pump-circle.blink {
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            50% { background-color: green; } /* Parpadea entre gris y verde en "ON" */
+        }
         .tank {
             width: 400px;
             height: 150px;
@@ -36,41 +66,100 @@
         }
         .water {
             width: calc(100% - 4px);
-            height: 50%; /* Nivel inicial del 50%, como en la imagen */
+            height: 50%; /* Nivel inicial del 50% */
             position: absolute;
             bottom: 2px;
-            background-color: #FFA500; /* Naranja, como en la imagen */
+            background-color: #FFA500; /* Naranja, como en tu imagen */
+            transition: height 0.5s ease;
         }
-        .pipe-pump {
-            width: 100px;
-            height: 150px;
-            margin: 10px 0;
-            position: relative;
+        .slider-container {
+            margin-left: 20px;
             display: inline-block;
         }
-        .pump-icon {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            background-image: url('data:image/svg+xml,<svg width="100" height="150" viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg"><path d="M0 0 H100 V150 H0 Z" fill="black" /><rect x="20" y="50" width="60" height="20" fill="gray" /><circle cx="50" cy="110" r="10" fill="gray" /><path d="M0 0 L20 20 L20 0 Z" fill="black" /><path d="M80 0 L100 20 L100 0 Z" fill="black" /><path d="M0 130 L20 150 L20 130 Z" fill="black" /><path d="M80 130 L100 150 L100 130 Z" fill="black" /></svg>');
+        .slider {
+            width: 20px;
+            height: 150px;
+            -webkit-appearance: slider-vertical;
+            appearance: slider-vertical;
+        }
+        .controls {
+            margin-top: 20px;
+        }
+        .pump-button {
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: background-color 0.3s;
+        }
+        .pump-button:hover {
+            background-color: #45a049;
+        }
+        .pump-button.off {
+            background-color: #f44336;
+        }
+        .pump-button.off:hover {
+            background-color: #da190b;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="main-content">
-            <div class="pipe-pump">
-                <div class="pump-icon"></div>
+            <div class="pump" id="pump">
+                <div class="pump-rectangle"></div>
+                <div class="pump-circle" id="pump-circle"></div>
             </div>
             <div class="tank">
-                <div class="water"></div>
+                <div class="water" id="water-level"></div>
+            </div>
+            <div class="slider-container">
+                <input type="range" class="slider" id="level-slider" min="0" max="100" value="50">
             </div>
         </div>
+        <div class="controls">
+            <button id="pump-toggle" class="pump-button">Marcha</button>
+        </div>
     </div>
+
+    <script>
+        const pumpCircle = document.getElementById("pump-circle");
+        const pumpRectangle = document.getElementById("pump-rectangle");
+        const pumpToggle = document.getElementById("pump-toggle");
+        const waterLevel = document.getElementById("water-level");
+        const slider = document.getElementById("level-slider");
+        let pumpOn = false;
+
+        // Estado inicial: Bomba "OFF" (círculo gris, rectángulo blanco)
+        pumpCircle.style.backgroundColor = "gray";
+        pumpRectangle.style.backgroundColor = "white";
+
+        // Controlar la bomba con el botón
+        pumpToggle.addEventListener("click", function() {
+            pumpOn = !pumpOn;
+            if (pumpOn) {
+                pumpToggle.textContent = "Paro";
+                pumpToggle.classList.add("off");
+                pumpRectangle.style.backgroundColor = "#00008B"; // Azul marino para "ON"
+                pumpCircle.classList.add("blink"); // Círculo parpadeando en verde
+            } else {
+                pumpToggle.textContent = "Marcha";
+                pumpToggle.classList.remove("off");
+                pumpRectangle.style.backgroundColor = "white"; // Blanco para "OFF"
+                pumpCircle.classList.remove("blink"); // Quitar parpadeo
+                pumpCircle.style.backgroundColor = "gray"; // Gris para "OFF"
+            }
+        });
+
+        // Actualizar el nivel del tanque con el slider
+        slider.addEventListener("input", function() {
+            const percentage = parseInt(slider.value);
+            waterLevel.style.height = percentage + "%";
+        });
+    </script>
 </body>
 </html>
