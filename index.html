@@ -42,7 +42,19 @@
             animation: blink 1s infinite; /* Intermitencia para alarma */
         }
         @keyframes blink {
-            50% { background-color: transparent; } /* Parpadea entre gris y transparente */
+            50% { background-color: transparent; } /* Parpadea entre el color y transparente */
+        }
+        .attention-icon {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            color: #FF0000; /* Rojo para el ícono, configurable después */
+        }
+        .attention-icon.blink {
+            animation: blink 1s infinite; /* Intermitencia para el ícono */
         }
         .pipe-pump {
             width: 50px;
@@ -147,6 +159,7 @@
         <h2>Depósito 1 - Capacidad total 443,73 m³</h2>
         <div class="tank">
             <div class="water" id="water-level"></div> <!-- Nivel inicial del 50% -->
+            <div class="attention-icon" id="attention-icon">⚠</div>
         </div>
         <div class="slider-container" id="slider-container">
             <input type="range" class="slider" id="level-slider" min="0" max="443730" value="221865">
@@ -177,6 +190,7 @@
             <label>50% (Color): <input type="color" id="color50" value="#FFA500"></label><br>
             <label>25% (Color): <input type="color" id="color25" value="#FFFF00"></label><br>
             <label>15% (Color): <input type="color" id="color15" value="#FF0000"></label><br><br>
+            <label>Color de Alarma (Fondo): <input type="color" id="alarmColor" value="#FFA500"></label><br><br> <!-- Nuevo campo para color de alarma -->
             <label>% Mínimo para Alarma: <input type="number" id="alarmThreshold" value="15" min="0" max="100"></label><br><br>
             <div class="tilt-option">
                 <label>Mostrar teclas simulación: <input type="checkbox" id="tilt-toggle"></label>
@@ -189,6 +203,7 @@
     <script>
         const totalLiters = 443730; // Capacidad total inicial en litros
         const tank = document.getElementById("water-level");
+        const attentionIcon = document.getElementById("attention-icon");
         const litersDisplay = document.getElementById("liters");
         const m3Display = document.getElementById("m3");
         const slider = document.getElementById("level-slider");
@@ -209,6 +224,39 @@
         const ctx = document.getElementById('levelChart').getContext('2d');
         const tiltToggle = document.getElementById("tilt-toggle");
 
+        // Cargar configuración inicial desde localStorage o valores por defecto
+        let config = JSON.parse(localStorage.getItem('config')) || {
+            capacity: 443730,
+            color100: '#00008B',
+            color75: '#ADD8E6',
+            color50: '#FFA500',
+            color25: '#FFFF00',
+            color15: '#FF0000',
+            alarmColor: '#FFA500', // Color inicial para alarma (rojo pistacho/naranja fluorescente)
+            alarmThreshold: 15,
+            showSimulation: false,
+            efento: {
+                email: 'contadorsranxos@gmail.com',
+                password: 'Ranxos2024@J@',
+                token: '',
+                orgID: '',
+                locationID: '',
+                measurementID: ''
+            }
+        };
+
+        let currentCapacity = config.capacity;
+        let defaultColors = {
+            100: config.color100,
+            75: config.color75,
+            50: config.color50,
+            25: config.color25,
+            15: config.color15
+        };
+        let alarmThreshold = config.alarmThreshold;
+        let alarmColor = config.alarmColor; // Nuevo para el color de alarma
+        let showSimulation = config.showSimulation;
+
         // Inicializar el número de semana y periodo (fecha actual)
         const today = new Date();
         const weekNumber = getWeekNumber(today);
@@ -225,7 +273,6 @@
         }
 
         // Actualizar el nivel del tanque y los valores según el slider
-        let currentCapacity = totalLiters;
         slider.addEventListener("input", function() {
             const liters = parseInt(slider.value);
             const percentage = (liters / currentCapacity) * 100;
@@ -241,15 +288,7 @@
             updateChart(liters / 1000); // Pasar m³ al gráfico
         }
 
-        // Colores del agua según rangos (simulados, se usarán los configurables después)
-        const defaultColors = {
-            100: '#00008B', // Azul Marino
-            75: '#ADD8E6',  // Azul Claro
-            50: '#FFA500',  // Naranja
-            25: '#FFFF00',  // Amarillo
-            15: '#FF0000'   // Rojo
-        };
-
+        // Colores del agua según rangos
         function updateWaterColor(percentage) {
             if (percentage >= 75) tank.style.backgroundColor = defaultColors[100];
             else if (percentage >= 60) tank.style.backgroundColor = defaultColors[75];
@@ -285,6 +324,15 @@
         // Configuración
         configBtn.addEventListener("click", function() {
             configModal.classList.add("show");
+            document.getElementById("capacity").value = config.capacity;
+            document.getElementById("color100").value = config.color100;
+            document.getElementById("color75").value = config.color75;
+            document.getElementById("color50").value = config.color50;
+            document.getElementById("color25").value = config.color25;
+            document.getElementById("color15").value = config.color15;
+            document.getElementById("alarmThreshold").value = config.alarmThreshold;
+            document.getElementById("alarmColor").value = config.alarmColor; // Nuevo campo para color de alarma
+            tiltToggle.checked = config.showSimulation; // Cambiado para mostrar ON = teclas visibles, OFF = teclas ocultas
         });
 
         closeConfig.addEventListener("click", function() {
@@ -292,15 +340,32 @@
         });
 
         saveConfig.addEventListener("click", function() {
-            currentCapacity = parseInt(document.getElementById("capacity").value) || 443730;
-            defaultColors[100] = document.getElementById("color100").value;
-            defaultColors[75] = document.getElementById("color75").value;
-            defaultColors[50] = document.getElementById("color50").value;
-            defaultColors[25] = document.getElementById("color25").value;
-            defaultColors[15] = document.getElementById("color15").value;
-            alarmThreshold = parseInt(document.getElementById("alarmThreshold").value) || 15;
-            const showSimulation = !tiltToggle.checked; // Invertido: ON oculta, OFF muestra
-            toggleSimulationMode(showSimulation);
+            config.capacity = parseInt(document.getElementById("capacity").value) || 443730;
+            config.color100 = document.getElementById("color100").value;
+            config.color75 = document.getElementById("color75").value;
+            config.color50 = document.getElementById("color50").value;
+            config.color25 = document.getElementById("color25").value;
+            config.color15 = document.getElementById("color15").value;
+            config.alarmColor = document.getElementById("alarmColor").value; // Guardar color de alarma
+            config.alarmThreshold = parseInt(document.getElementById("alarmThreshold").value) || 15;
+            config.showSimulation = tiltToggle.checked; // Cambiado: ON muestra teclas, OFF las oculta
+            config.efento.email = prompt("Correo de EFENTO (dejar vacío para no cambiar):") || config.efento.email;
+            config.efento.password = prompt("Contraseña de EFENTO (dejar vacío para no cambiar):") || config.efento.password;
+            config.efento.token = prompt("Token de EFENTO (dejar vacío para no cambiar):") || config.efento.token;
+            config.efento.orgID = prompt("ID de Organización de EFENTO (dejar vacío para no cambiar):") || config.efento.orgID;
+            config.efento.locationID = prompt("ID de Ubicación de EFENTO (dejar vacío para no cambiar):") || config.efento.locationID;
+            config.efento.measurementID = prompt("ID de Medición de EFENTO (dejar vacío para no cambiar):") || config.efento.measurementID;
+
+            localStorage.setItem('config', JSON.stringify(config));
+            currentCapacity = config.capacity;
+            defaultColors[100] = config.color100;
+            defaultColors[75] = config.color75;
+            defaultColors[50] = config.color50;
+            defaultColors[25] = config.color25;
+            defaultColors[15] = config.color15;
+            alarmThreshold = config.alarmThreshold;
+            alarmColor = config.alarmColor; // Actualizar color de alarma
+            toggleSimulationMode(config.showSimulation);
             configModal.classList.remove("show");
             const liters = parseInt(slider.value);
             const percentage = (liters / currentCapacity) * 100;
@@ -308,12 +373,16 @@
             checkAlarm(percentage);
         });
 
-        let alarmThreshold = 15; // Umbral inicial para alarma
+        let alarmThreshold = config.alarmThreshold; // Umbral inicial para alarma
+        let alarmColor = config.alarmColor; // Color inicial para alarma
 
         function checkAlarm(percentage) {
             if (percentage <= alarmThreshold) {
                 alarm.style.display = "block";
                 tank.classList.add("blink"); // Activar intermitencia del agua
+                tank.style.backgroundColor = alarmColor; // Usar el color de alarma configurado
+                attentionIcon.style.display = "block";
+                attentionIcon.classList.add("blink"); // Activar intermitencia del ícono
                 alarm.innerHTML = `¡Alarma! Nivel bajo en Depósito 1 - ${percentage.toFixed(1)}% <br>
                     <a href="mailto:?subject=Alarma%20Depósito%201&body=Nivel%20bajo:%20${percentage.toFixed(1)}%" target="_blank">Enviar Email</a> | 
                     <a href="https://wa.me/?text=Alarma%20Depósito%201:%20Nivel%20bajo%20${percentage.toFixed(1)}%" target="_blank">Enviar WhatsApp</a> | 
@@ -321,6 +390,9 @@
             } else {
                 alarm.style.display = "none";
                 tank.classList.remove("blink"); // Desactivar intermitencia del agua
+                tank.style.backgroundColor = "#ddd"; // Volver al fondo gris por defecto
+                attentionIcon.style.display = "none";
+                attentionIcon.classList.remove("blink"); // Desactivar intermitencia del ícono
             }
         }
 
@@ -370,8 +442,7 @@
         pumpIcon.style.backgroundColor = "white"; // Icono de la bomba inicial en blanco
         pumpToggle.textContent = "Simular Bomba ON";
         pumpCounterDisplay.textContent = pumpCounter;
-        simulationControls.style.display = "block"; // Mostrar controles de simulación inicialmente
-        tiltToggle.checked = false; // "Mostrar teclas simulación" inicialmente desactivado (OFF)
+        toggleSimulationMode(config.showSimulation); // Mostrar u ocultar según configuración inicial
     </script>
 </body>
 </html>
