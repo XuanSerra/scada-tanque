@@ -155,7 +155,7 @@
             <p>M³ actuales: <span id="m3">221,865</span> m³</p>
             <p>Litros actuales: <span id="liters">221865</span> litros</p>
             <p>Nº de semana actual: <span id="week-number"></span> - Periodo: <span id="period"></span></p>
-            <p>Contador ON/OFF Bomba: <span id "pump-counter">0</span></p>
+            <p>Contador ON/OFF Bomba: <span id="pump-counter">0</span></p>
         </div>
         <div class="pipe-pump" id="pipe-pump">
             <div class="pump-icon" id="pump-icon"></div>
@@ -179,7 +179,7 @@
             <label>15% (Color): <input type="color" id="color15" value="#FF0000"></label><br><br>
             <label>% Mínimo para Alarma: <input type="number" id="alarmThreshold" value="15" min="0" max="100"></label><br><br>
             <div class="tilt-option">
-                <label>Tilt: <input type="checkbox" id="tilt-toggle"></label>
+                <label>Mostrar teclas simulación: <input type="checkbox" id="tilt-toggle"></label>
             </div>
             <button id="save-config">Guardar</button>
             <button id="close-config">Cerrar</button>
@@ -299,8 +299,8 @@
             defaultColors[25] = document.getElementById("color25").value;
             defaultColors[15] = document.getElementById("color15").value;
             alarmThreshold = parseInt(document.getElementById("alarmThreshold").value) || 15;
-            const tilt = tiltToggle.checked;
-            toggleSimulationMode(tilt);
+            const showSimulation = !tiltToggle.checked; // Invertido: ON oculta, OFF muestra
+            toggleSimulationMode(showSimulation);
             configModal.classList.remove("show");
             const liters = parseInt(slider.value);
             const percentage = (liters / currentCapacity) * 100;
@@ -324,13 +324,13 @@
             }
         }
 
-        function toggleSimulationMode(tilt) {
-            if (tilt) {
-                sliderContainer.style.display = "none";
-                simulationControls.style.display = "block";
-            } else {
+        function toggleSimulationMode(showSimulation) {
+            if (showSimulation) {
                 sliderContainer.style.display = "inline-block";
                 simulationControls.style.display = "block";
+            } else {
+                sliderContainer.style.display = "none";
+                simulationControls.style.display = "none";
             }
         }
 
@@ -371,7 +371,7 @@
         pumpToggle.textContent = "Simular Bomba ON";
         pumpCounterDisplay.textContent = pumpCounter;
         simulationControls.style.display = "block"; // Mostrar controles de simulación inicialmente
-        tiltToggle.checked = false; // Tilt inicialmente desactivado
+        tiltToggle.checked = false; // "Mostrar teclas simulación" inicialmente desactivado (OFF)
     </script>
 </body>
 </html>
