@@ -20,8 +20,8 @@
             width: 800px;
         }
         .tank {
-            width: 400px;
-            height: 200px;
+            width: 200px; /* Mantenemos un ancho razonable para un tanque apaisado */
+            height: 400px; /* Altura mayor para un tanque vertical */
             border: 2px solid #333;
             border-radius: 10px;
             position: relative;
@@ -31,12 +31,12 @@
             vertical-align: middle;
         }
         .water {
-            height: 100%;
-            width: 50%; /* Nivel inicial del 50%, de izquierda a derecha */
+            width: 100%; /* Ancho completo para un tanque vertical */
+            height: 50%; /* Nivel inicial del 50%, de abajo hacia arriba */
             position: absolute;
-            left: 0;
-            background-color: gray; /* Color gris temporal, lo cambiaremos según rango */
-            transition: width 0.5s ease;
+            bottom: 0; /* Posiciona el agua desde abajo */
+            background-color: gray; /* Color gris temporal */
+            transition: height 0.5s ease;
         }
         .pipe-pump {
             width: 50px;
@@ -79,10 +79,10 @@
             vertical-align: middle;
         }
         .slider {
-            width: 400px; /* Slider horizontal para mejor manejo */
-            height: 20px;
-            -webkit-appearance: slider-horizontal;
-            appearance: slider-horizontal;
+            width: 20px; /* Slider vertical, ancho pequeño */
+            height: 400px; /* Misma altura que el tanque */
+            -webkit-appearance: slider-vertical; /* Asegurar que sea vertical */
+            appearance: slider-vertical;
         }
         button {
             margin: 5px;
@@ -219,7 +219,7 @@
         });
 
         function updateTank(liters, percentage) {
-            tank.style.width = percentage + "%";
+            tank.style.height = percentage + "%"; // Cambiado a height para tanque vertical
             litersDisplay.textContent = liters;
             m3Display.textContent = (liters / 1000).toFixed(3); // Convertir litros a m³
             updateWaterColor(percentage);
@@ -296,7 +296,6 @@
         function checkAlarm(percentage) {
             if (percentage <= alarmThreshold) {
                 alarm.style.display = "block";
-                // Enlaces manuales para alarmas
                 alarm.innerHTML = `¡Alarma! Nivel bajo en Depósito 1 - ${percentage.toFixed(1)}% <br>
                     <a href="mailto:?subject=Alarma%20Depósito%201&body=Nivel%20bajo:%20${percentage.toFixed(1)}%" target="_blank">Enviar Email</a> | 
                     <a href="https://wa.me/?text=Alarma%20Depósito%201:%20Nivel%20bajo%20${percentage.toFixed(1)}%" target="_blank">Enviar WhatsApp</a> | 
