@@ -72,6 +72,30 @@
             background-color: #FFA500; /* Naranja, como en tu imagen */
             transition: height 0.5s ease;
         }
+        .pipe {
+            width: 20px;
+            height: 200px; /* Altura suficiente para simular la curva */
+            position: relative;
+            display: inline-block;
+            margin-left: -10px; /* Ajuste para conectar con el tanque */
+        }
+        .pipe-path {
+            width: 20px;
+            height: 200px;
+            background: linear-gradient(90deg, transparent 10px, blue 10px, blue 15px, transparent 15px);
+            position: absolute;
+            top: -50px; /* Ajuste para posicionar arriba del tanque */
+            left: 0;
+        }
+        .pipe-curve {
+            width: 50px; /* Ancho de la curva */
+            height: 20px; /* Altura de la curva */
+            background: blue;
+            position: absolute;
+            top: -70px; /* Posicionar la curva 90° arriba */
+            left: -15px; /* Ajuste para conectar con el tubo vertical */
+            border-radius: 0 0 0 5px; /* Curva suave en la esquina inferior izquierda */
+        }
         .slider-container {
             margin-left: 20px;
             display: inline-block;
@@ -81,6 +105,11 @@
             height: 150px;
             -webkit-appearance: slider-vertical;
             appearance: slider-vertical;
+        }
+        .info {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #444;
         }
         .controls {
             margin-top: 20px;
@@ -116,10 +145,19 @@
             </div>
             <div class="tank">
                 <div class="water" id="water-level"></div>
+                <div class="pipe">
+                    <div class="pipe-path"></div>
+                    <div class="pipe-curve"></div>
+                </div>
             </div>
             <div class="slider-container">
                 <input type="range" class="slider" id="level-slider" min="0" max="100" value="50">
             </div>
+        </div>
+        <div class="info">
+            <p>M³: <span id="m3">222</span></p>
+            <p>Litros: <span id="liters">221865.00</span></p>
+            <p>% NIVEL: <span id="percentage">50</span></p>
         </div>
         <div class="controls">
             <button id="pump-toggle" class="pump-button">Marcha</button>
@@ -132,6 +170,9 @@
         const pumpToggle = document.getElementById("pump-toggle");
         const waterLevel = document.getElementById("water-level");
         const slider = document.getElementById("level-slider");
+        const m3Display = document.getElementById("m3");
+        const litersDisplay = document.getElementById("liters");
+        const percentageDisplay = document.getElementById("percentage");
         let pumpOn = false;
 
         // Estado inicial: Bomba "OFF" (círculo gris, rectángulo blanco)
@@ -155,10 +196,16 @@
             }
         });
 
-        // Actualizar el nivel del tanque con el slider
+        // Actualizar el nivel del tanque con el slider y los datos
+        const totalLiters = 443730; // Capacidad total en litros (443,73 m³)
         slider.addEventListener("input", function() {
             const percentage = parseInt(slider.value);
+            const liters = (percentage / 100) * totalLiters;
+            const m3 = Math.floor(liters / 1000); // M³ en enteros
             waterLevel.style.height = percentage + "%";
+            percentageDisplay.textContent = percentage;
+            m3Display.textContent = m3;
+            litersDisplay.textContent = liters.toFixed(2); // Litros con 2 decimales
         });
     </script>
 </body>
