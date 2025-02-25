@@ -38,10 +38,20 @@
             margin-top: 10px;
             color: #333;
         }
+        .indicador {
+            margin-top: 10px;
+            font-size: 1.1em;
+        }
     </style>
 </head>
 <body>
     <h1>SCADA-TANKE: Depósito 1</h1>
+    <p>Capacidad total 443,73 m³</p>
+    <div class="indicador">
+        Nivel: <span id="nivelIndicador">0%</span> - 
+        <span id="metrosCubicos">0 m³</span> - 
+        <span id="litros">0 litros</span>
+    </div>
     <div class="container">
         <div class="data">
             <h2>Datos en Tiempo Real</h2>
@@ -64,6 +74,7 @@
         let nivel = 50; // Nivel inicial del tanque (0-100%)
         let temperatura = 25; // Temperatura inicial
         let bombaEncendida = false;
+        const capacidadTotal = 443.73; // Capacidad en m³
 
         function actualizarDatos() {
             nivel += Math.random() * 2 - 1; // Simula variación del nivel
@@ -73,7 +84,15 @@
             temperatura += Math.random() * 0.5 - 0.25; // Simula variación de temperatura
             if (temperatura < 0) temperatura = 0;
 
+            // Calcular valores teóricos
+            const metrosCubicos = (nivel / 100) * capacidadTotal;
+            const litros = metrosCubicos * 1000;
+
+            // Actualizar elementos en la interfaz
             document.getElementById("nivel").textContent = nivel.toFixed(1) + "%";
+            document.getElementById("nivelIndicador").textContent = nivel.toFixed(1) + "%";
+            document.getElementById("metrosCubicos").textContent = metrosCubicos.toFixed(2) + " m³";
+            document.getElementById("litros").textContent = Math.round(litros) + " litros";
             document.getElementById("temperatura").textContent = temperatura.toFixed(1) + "°C";
             document.getElementById("bomba").textContent = bombaEncendida ? "Encendida" : "Apagada";
         }
