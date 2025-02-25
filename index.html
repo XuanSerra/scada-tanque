@@ -39,7 +39,7 @@
             position: absolute;
             bottom: 0;
             left: 0;
-            background-color: gray; /* Color inicial gris para "OFF" */
+            background-color: #4CAF50; /* Verde, como en la imagen para "OFF" */
         }
         .pump-rectangle {
             width: 15px;
@@ -47,13 +47,7 @@
             position: absolute;
             top: 0;
             left: 32.5px; /* Centrado horizontalmente (80px / 2 - 15px / 2) */
-            background-color: white; /* Color inicial blanco para "OFF" */
-        }
-        .pump-circle.blink {
-            animation: blink 1s infinite;
-        }
-        @keyframes blink {
-            50% { background-color: green; } /* Parpadea entre gris y verde en "ON" */
+            background-color: #00008B; /* Azul marino, como en la imagen */
         }
         .tank {
             width: 400px;
@@ -66,7 +60,7 @@
         }
         .water {
             width: calc(100% - 4px);
-            height: 49%; /* Nivel inicial del 49%, como en la imagen */
+            height: 34%; /* Nivel inicial del 34%, como en la imagen */
             position: absolute;
             bottom: 2px;
             background-color: #FFA500; /* Naranja, como en tu imagen */
@@ -111,7 +105,7 @@
             padding: 12px 24px;
             font-size: 16px;
             cursor: pointer;
-            background-color: #4CAF50;
+            background-color: #f44336; /* Rojo, como "Paro" en la imagen */
             color: white;
             border: none;
             border-radius: 5px;
@@ -119,13 +113,13 @@
             transition: background-color 0.3s;
         }
         .pump-button:hover {
-            background-color: #45a049;
-        }
-        .pump-button.off {
-            background-color: #f44336;
-        }
-        .pump-button.off:hover {
             background-color: #da190b;
+        }
+        .pump-button.on {
+            background-color: #4CAF50; /* Verde para "Marcha" */
+        }
+        .pump-button.on:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
@@ -133,7 +127,7 @@
     <div class="container">
         <div class="main-content">
             <div class="pump" id="pump">
-                <div class="pump-rectangle" id="pump-rectangle"></div>
+                <div class="pump-rectangle"></div>
                 <div class="pump-circle" id="pump-circle"></div>
             </div>
             <div class="tank">
@@ -143,49 +137,47 @@
                 </div>
             </div>
             <div class="slider-container">
-                <input type="range" class="slider" id="level-slider" min="0" max="100" value="49">
+                <input type="range" class="slider" id="level-slider" min="0" max="100" value="34">
             </div>
         </div>
         <div class="info">
-            <p>M³: <span id="m3">217</span></p>
-            <p>Litros: <span id="liters">217427</span></p>
-            <p>% NIVEL: <span id="percentage">49</span></p>
+            <p>M³: <span id="m3">150</span></p>
+            <p>Litros: <span id="liters">150868</span></p>
         </div>
         <div class="controls">
-            <button id="pump-toggle" class="pump-button">Marcha</button>
+            <button id="pump-toggle" class="pump-button">Paro</button>
         </div>
-    </div>
+    </body>
+</html>
 
     <script>
         const pumpCircle = document.getElementById("pump-circle");
-        const pumpRectangle = document.getElementById("pump-rectangle");
         const pumpToggle = document.getElementById("pump-toggle");
         const waterLevel = document.getElementById("water-level");
         const levelIndicatorFill = document.getElementById("level-indicator-fill");
         const slider = document.getElementById("level-slider");
         const m3Display = document.getElementById("m3");
         const litersDisplay = document.getElementById("liters");
-        const percentageDisplay = document.getElementById("percentage");
         let pumpOn = false;
 
-        // Estado inicial: Bomba "OFF" (círculo gris, rectángulo blanco)
-        pumpCircle.style.backgroundColor = "gray";
-        pumpRectangle.style.backgroundColor = "white";
+        // Estado inicial: Bomba "OFF" (círculo verde, rectángulo azul marino, botón "Paro" rojo)
+        pumpCircle.style.backgroundColor = "#4CAF50"; // Verde, como en la imagen
+        pumpToggle.classList.add("off");
 
         // Controlar la bomba con el botón
         pumpToggle.addEventListener("click", function() {
             pumpOn = !pumpOn;
             if (pumpOn) {
-                pumpToggle.textContent = "Paro";
-                pumpToggle.classList.add("off");
-                pumpRectangle.style.backgroundColor = "#00008B"; // Azul marino para "ON"
-                pumpCircle.classList.add("blink"); // Círculo parpadeando en verde
-            } else {
                 pumpToggle.textContent = "Marcha";
                 pumpToggle.classList.remove("off");
-                pumpRectangle.style.backgroundColor = "white"; // Blanco para "OFF"
+                pumpToggle.classList.add("on");
+                pumpCircle.classList.add("blink"); // Círculo parpadeando en verde (aunque en la imagen está fijo en verde para "OFF", asumimos parpadeo para "ON")
+            } else {
+                pumpToggle.textContent = "Paro";
+                pumpToggle.classList.add("off");
+                pumpToggle.classList.remove("on");
                 pumpCircle.classList.remove("blink"); // Quitar parpadeo
-                pumpCircle.style.backgroundColor = "gray"; // Gris para "OFF"
+                pumpCircle.style.backgroundColor = "#4CAF50"; // Verde para "OFF", como en la imagen
             }
         });
 
@@ -197,7 +189,6 @@
             const m3 = Math.floor(liters / 1000); // M³ en enteros
             waterLevel.style.height = percentage + "%";
             levelIndicatorFill.style.height = percentage + "%"; // Actualizar el indicador de nivel
-            percentageDisplay.textContent = percentage;
             m3Display.textContent = m3;
             litersDisplay.textContent = liters; // Litros sin decimales
         });
