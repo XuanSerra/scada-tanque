@@ -175,8 +175,8 @@
             <label>100% (Color): <input type="color" id="color100" value="#00008B"></label><br>
             <label>75% (Color): <input type="color" id="color75" value="#ADD8E6"></label><br>
             <label>50% (Color): <input type="color" id="color50" value="#FFA500"></label><br>
-            <label>25% (Color): <input type="color" id="color25" value="#FFFF00"></label><br>
-            <label>15% (Color): <input type="color" id="color15" value="#FF0000"></label><br><br>
+            <label>Por debajo del 50% hasta 0, qué color quiero...: <input type="color" id="color25" value="#FFFF00"></label><br> <!-- Cambiado -->
+            <label>Color alarma nivel mínimo de agua: <input type="color" id="color15" value="#FF0000"></label><br><br> <!-- Cambiado -->
             <label>% Mínimo para Alarma: <input type="number" id="alarmThreshold" value="15" min="0" max="100"></label><br><br>
             <div class="tilt-option">
                 <label>Mostrar teclas simulación: <input type="checkbox" id="tilt-toggle"></label>
@@ -246,8 +246,8 @@
             100: '#00008B', // Azul Marino
             75: '#ADD8E6',  // Azul Claro
             50: '#FFA500',  // Naranja
-            25: '#FFFF00',  // Amarillo
-            15: '#FF0000'   // Rojo
+            25: '#FFFF00',  // Amarillo (por debajo del 50% hasta 0)
+            15: '#FF0000'   // Rojo (alarma nivel mínimo)
         };
 
         function updateWaterColor(percentage) {
@@ -299,7 +299,7 @@
             defaultColors[25] = document.getElementById("color25").value;
             defaultColors[15] = document.getElementById("color15").value;
             alarmThreshold = parseInt(document.getElementById("alarmThreshold").value) || 15;
-            const showSimulation = !tiltToggle.checked; // Invertido: ON oculta, OFF muestra
+            const showSimulation = tiltToggle.checked; // Corregido: ON muestra, OFF oculta
             toggleSimulationMode(showSimulation);
             configModal.classList.remove("show");
             const liters = parseInt(slider.value);
@@ -375,3 +375,6 @@
     </script>
 </body>
 </html>
+</DOCUMENT>
+
+Refiérase al siguiente contenido:
