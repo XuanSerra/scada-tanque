@@ -49,38 +49,34 @@
         }
         .water {
             width: calc(100% - 4px);
-            height: 15.2%; /* Nivel inicial del 15.2%, como en la imagen */
+            height: 15.2%;
             position: absolute;
             bottom: 2px;
-            background-color: #FFB6C1; /* Rosa claro, como en la imagen */
+            background-color: #FFB6C1;
             transition: height 0.5s ease;
         }
         .water.blink {
             animation: blink 1s infinite;
         }
         @keyframes blink {
-            50% { background-color: #FF0000; } /* Parpadea entre rosa y rojo (alarma) */
+            50% { background-color: #FF0000; }
         }
         .pipe-pump {
-            width: 50px;
-            height: 100px;
-            border: 2px solid #333;
+            width: 100px; /* Ajustado para acomodar la imagen completa */
+            height: 150px; /* Ajustado para la altura del icono */
             margin: 10px 0;
-            background-color: #ADD8E6; /* Azul claro, como en la imagen */
             position: relative;
             display: inline-block;
         }
         .pump-icon {
-            width: 40px;
-            height: 40px;
-            background-color: transparent;
+            width: 100%;
+            height: 100%;
             position: absolute;
-            bottom: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v-2h-2v2zm0-4h2V7h-2v5z"/></svg>');
+            top: 0;
+            left: 0;
             background-size: contain;
             background-repeat: no-repeat;
+            background-position: center;
         }
         .slider-container {
             margin-left: 20px;
@@ -142,7 +138,7 @@
         <div class="main-content">
             <div class="left-section">
                 <div class="pipe-pump" id="pipe-pump">
-                    <div class="pump-icon" id="pump-icon"></div>
+                    <div class="pump-icon" id="pump-icon" style="background-image: url('URL_BOMBA_STOP');"></div>
                 </div>
                 <div class="tank">
                     <div class="water" id="water-level"></div>
@@ -206,13 +202,13 @@
             updateChart(m3);
         }
 
-        // Colores del agua según rangos (simulados, se usarán los configurables después)
+        // Colores del agua según rangos
         const defaultColors = {
-            100: '#00008B', // Azul Marino
-            75: '#ADD8E6',  // Azul Claro
-            50: '#FFA500',  // Naranja
-            25: '#FFFF00',  // Amarillo
-            15: '#FFB6C1'   // Rosa claro (nivel bajo, como en la imagen)
+            100: '#00008B',
+            75: '#ADD8E6',
+            50: '#FFA500',
+            25: '#FFFF00',
+            15: '#FFB6C1'
         };
 
         function updateWaterColor(percentage) {
@@ -223,28 +219,47 @@
             else tank.style.backgroundColor = defaultColors[15];
         }
 
-        // Simular ON/OFF de la bomba y contar veces
+        // Simular ON/OFF de la bomba y alternar entre on1 y on2 para movimiento
         let pumpOn = false;
         let pumpCounter = 0;
+        let pumpState = 1; // 1 para on1, 2 para on2
+
         pumpToggle.addEventListener("click", function() {
             pumpOn = !pumpOn;
             if (pumpOn) {
-                pipePump.style.backgroundColor = "#ADD8E6"; // Azul claro, como en la imagen
-                pumpIcon.style.backgroundImage = 'url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"white\"><path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v-2h-2v2zm0-4h2V7h-2v5z\"/></svg>")';
+                pipePump.style.backgroundColor = "blue"; // Tubo azul para indicar agua
+                simulatePumpMovement();
                 pumpToggle.textContent = "Simular Bomba OFF";
             } else {
-                pipePump.style.backgroundColor = "white";
-                pumpIcon.style.backgroundImage = 'url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"gray\"><path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v-2h-2v2zm0-4h2V7h-2v5z\"/></svg>")';
+                pipePump.style.backgroundColor = "white"; // Tubo blanco para detenido
+                pumpIcon.style.backgroundImage = `url('URL_BOMBA_STOP')`;
+                clearInterval(pumpAnimation);
                 pumpToggle.textContent = "Simular Bomba ON";
             }
             pumpCounter++;
             pumpCounterDisplay.textContent = pumpCounter;
         });
 
+        // Simular movimiento alternando entre on1 y on2
+        let pumpAnimation;
+        function simulatePumpMovement() {
+            pumpAnimation = setInterval(() => {
+                pumpState = pumpState === 1 ? 2 : 1;
+                if (pumpState === 1) {
+                    pumpIcon.style.backgroundImage = `url('URL_BOMBA_ON1')`;
+                } else {
+                    pumpIcon.style.backgroundImage = `url('URL_BOMBA_ON2')`;
+                }
+            }, 500); // Cambia cada 0.5 segundos para simular movimiento
+        }
+
         // Resetear contador de ON/OFF
         resetCounter.addEventListener("click", function() {
             pumpCounter = 0;
             pumpCounterDisplay.textContent = pumpCounter;
+            if (!pumpOn) {
+                pumpIcon.style.backgroundImage = `url('URL_BOMBA_STOP')`;
+            }
         });
 
         // Alarma fija para nivel bajo (15.2%)
@@ -261,4 +276,43 @@
 
         // Gráfico simulado en m³
         let chart;
-        const labels = ['Día 1', 'Día 2', 'Día 3', 'Día 4', 'Día 5', 'Día 6', 'Día
+        const labels = ['Día 1', 'Día 2', 'Día 3', 'Día 4', 'Día 5', 'Día 6', 'Día 7', 'Día 8', 'Día 9', 'Día 10'];
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Nivel de agua (m³)',
+                data: [443.73, 400.00, 350.00, 300.00, 250.00, 200.00, 150.00, 100.00, 80.00, 67.298],
+                borderColor: 'rgba(0, 150, 136, 1)',
+                backgroundColor: 'rgba(0, 150, 136, 0.2)',
+                fill: true
+            }]
+        };
+
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true, max: 443.73, title: { display: true, text: 'Nivel de agua (m³)' } } }
+            }
+        });
+
+        function updateChart(m3) {
+            chart.data.datasets[0].data.shift();
+            chart.data.datasets[0].data.push(parseFloat(m3));
+            chart.update();
+        }
+
+        // Inicializar el tanque al 15.2%
+        slider.value = 67298;
+        slider.dispatchEvent(new Event("input"));
+        pipePump.style.backgroundColor = "white";
+        pumpIcon.style.backgroundImage = `url('URL_BOMBA_STOP')`;
+        pumpToggle.textContent = "Simular Bomba ON";
+        pumpCounterDisplay.textContent = pumpCounter;
+        simulationControls.style.display = "block";
+        checkAlarm(15.2);
+    </script>
+</body>
+</html>
