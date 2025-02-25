@@ -7,26 +7,62 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 2em;
+            color: #333;
+        }
+        .capacity {
+            margin: 0 0 20px 0;
+            font-size: 1.1em;
+            color: #666;
+        }
+        .indicador {
+            margin: 10px 0 20px 0;
+            font-size: 1.1em;
+            color: #444;
         }
         .container {
             display: flex;
-            justify-content: space-around;
-            margin: 20px;
+            gap: 20px;
+            justify-content: center;
+            width: 100%;
+            max-width: 1000px;
         }
-        .data, .controls {
+        .card {
             background-color: white;
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 45%;
+            text-align: left;
+        }
+        .card h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.5em;
+            color: #333;
+        }
+        .card p {
+            margin: 5px 0;
+            font-size: 1em;
+            color: #555;
         }
         button {
             padding: 10px 20px;
             background-color: #4CAF50;
             color: white;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
         }
         button:hover {
             background-color: #45a049;
@@ -34,32 +70,34 @@
         .config {
             margin-top: 20px;
         }
+        .config label {
+            display: block;
+            margin: 5px 0;
+            color: #444;
+        }
         #teclasSimulacion {
             margin-top: 10px;
-            color: #333;
-        }
-        .indicador {
-            margin-top: 10px;
-            font-size: 1.1em;
+            color: #666;
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
     <h1>SCADA-TANKE: Depósito 1</h1>
-    <p>Capacidad total 443,73 m³</p>
+    <p class="capacity">Capacidad total 443,73 m³</p>
     <div class="indicador">
         Nivel: <span id="nivelIndicador">0%</span> - 
         <span id="metrosCubicos">0 m³</span> - 
         <span id="litros">0 litros</span>
     </div>
     <div class="container">
-        <div class="data">
+        <div class="card">
             <h2>Datos en Tiempo Real</h2>
             <p>Nivel del tanque: <span id="nivel">0%</span></p>
             <p>Temperatura: <span id="temperatura">0°C</span></p>
             <p>Estado de la bomba: <span id="bomba">Apagada</span></p>
         </div>
-        <div class="controls">
+        <div class="card">
             <h2>Controles</h2>
             <button onclick="toggleBomba()">Encender/Apagar Bomba</button>
             <div class="config">
