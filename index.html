@@ -7,62 +7,26 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        h1 {
-            margin: 0 0 10px 0;
-            font-size: 2em;
-            color: #333;
-        }
-        .capacity {
-            margin: 0 0 20px 0;
-            font-size: 1.1em;
-            color: #666;
-        }
-        .indicador {
-            margin: 10px 0 20px 0;
-            font-size: 1.1em;
-            color: #444;
+            text-align: center;
+            background-color: #f0f0f0;
         }
         .container {
             display: flex;
-            gap: 20px;
-            justify-content: center;
-            width: 100%;
-            max-width: 1000px;
+            justify-content: space-around;
+            margin: 20px;
         }
-        .card {
+        .data, .controls {
             background-color: white;
-            padding: 15px;
+            padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            width: 45%;
-            text-align: left;
-        }
-        .card h2 {
-            margin: 0 0 10px 0;
-            font-size: 1.5em;
-            color: #333;
-        }
-        .card p {
-            margin: 5px 0;
-            font-size: 1em;
-            color: #555;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         button {
             padding: 10px 20px;
             background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
         }
         button:hover {
             background-color: #45a049;
@@ -70,34 +34,22 @@
         .config {
             margin-top: 20px;
         }
-        .config label {
-            display: block;
-            margin: 5px 0;
-            color: #444;
-        }
         #teclasSimulacion {
             margin-top: 10px;
-            color: #666;
-            font-size: 0.9em;
+            color: #333;
         }
     </style>
 </head>
 <body>
     <h1>SCADA-TANKE: Depósito 1</h1>
-    <p class="capacity">Capacidad total 443,73 m³</p>
-    <div class="indicador">
-        Nivel: <span id="nivelIndicador">0%</span> - 
-        <span id="metrosCubicos">0 m³</span> - 
-        <span id="litros">0 litros</span>
-    </div>
     <div class="container">
-        <div class="card">
+        <div class="data">
             <h2>Datos en Tiempo Real</h2>
             <p>Nivel del tanque: <span id="nivel">0%</span></p>
             <p>Temperatura: <span id="temperatura">0°C</span></p>
             <p>Estado de la bomba: <span id="bomba">Apagada</span></p>
         </div>
-        <div class="card">
+        <div class="controls">
             <h2>Controles</h2>
             <button onclick="toggleBomba()">Encender/Apagar Bomba</button>
             <div class="config">
@@ -112,7 +64,6 @@
         let nivel = 50; // Nivel inicial del tanque (0-100%)
         let temperatura = 25; // Temperatura inicial
         let bombaEncendida = false;
-        const capacidadTotal = 443.73; // Capacidad en m³
 
         function actualizarDatos() {
             nivel += Math.random() * 2 - 1; // Simula variación del nivel
@@ -122,15 +73,7 @@
             temperatura += Math.random() * 0.5 - 0.25; // Simula variación de temperatura
             if (temperatura < 0) temperatura = 0;
 
-            // Calcular valores teóricos
-            const metrosCubicos = (nivel / 100) * capacidadTotal;
-            const litros = metrosCubicos * 1000;
-
-            // Actualizar elementos en la interfaz
             document.getElementById("nivel").textContent = nivel.toFixed(1) + "%";
-            document.getElementById("nivelIndicador").textContent = nivel.toFixed(1) + "%";
-            document.getElementById("metrosCubicos").textContent = metrosCubicos.toFixed(2) + " m³";
-            document.getElementById("litros").textContent = Math.round(litros) + " litros";
             document.getElementById("temperatura").textContent = temperatura.toFixed(1) + "°C";
             document.getElementById("bomba").textContent = bombaEncendida ? "Encendida" : "Apagada";
         }
