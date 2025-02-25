@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>scada-tanque - Depósito 1</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,25 +17,13 @@
         }
         .container {
             text-align: center;
-            width: 1000px;
-            max-width: 90%;
-        }
-        .header {
-            margin-bottom: 20px;
-            font-size: 18px;
-            color: #333;
+            width: 600px;
         }
         .main-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 20px;
-        }
-        .left-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
         .tank {
             width: 400px;
@@ -49,21 +36,14 @@
         }
         .water {
             width: calc(100% - 4px);
-            height: 15.2%;
+            height: 15.2%; /* Nivel inicial del 15.2%, como en la imagen */
             position: absolute;
             bottom: 2px;
-            background-color: #FFB6C1;
-            transition: height 0.5s ease;
-        }
-        .water.blink {
-            animation: blink 1s infinite;
-        }
-        @keyframes blink {
-            50% { background-color: #FF0000; }
+            background-color: #FFB6C1; /* Rosa claro, como en la imagen */
         }
         .pipe-pump {
-            width: 100px; /* Ajustado para acomodar la imagen completa */
-            height: 150px; /* Ajustado para la altura del icono */
+            width: 100px;
+            height: 150px;
             margin: 10px 0;
             position: relative;
             display: inline-block;
@@ -77,242 +57,20 @@
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-        }
-        .slider-container {
-            margin-left: 20px;
-            display: inline-block;
-        }
-        .slider {
-            width: 20px;
-            height: 150px;
-            -webkit-appearance: slider-vertical;
-            appearance: slider-vertical;
-        }
-        .info {
-            margin-top: 10px;
-            font-size: 16px;
-            color: #444;
-            line-height: 1.5;
-        }
-        .right-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .chart-container {
-            width: 400px;
-            height: 200px;
-            margin: 10px 0;
-        }
-        button {
-            margin: 5px;
-            padding: 8px 16px;
-            font-size: 14px;
-            cursor: pointer;
-            background-color: #e0e0e0;
-            color: #333;
-            border: 1px solid #999;
-            border-radius: 3px;
-        }
-        button:hover {
-            background-color: #d0d0d0;
-        }
-        .controls {
-            margin-top: 10px;
-        }
-        .alert {
-            display: none;
-            color: red;
-            margin-top: 10px;
-            font-weight: bold;
+            background-image: url('data:image/svg+xml,<svg width="100" height="150" viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="100" height="150" fill="black" /><rect x="20" y="50" width="60" height="20" fill="gray" /><circle cx="50" cy="110" r="10" fill="gray" /></svg>');
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <span>Nº de semana actual: 9 - Periodo: Martes, 25 febrero</span>
-        </div>
-        <h2>Depósito 1 - Capacidad total 443,73 m³</h2>
         <div class="main-content">
-            <div class="left-section">
-                <div class="pipe-pump" id="pipe-pump">
-                    <div class="pump-icon" id="pump-icon" style="background-image: url('URL_BOMBA_STOP');"></div>
-                </div>
-                <div class="tank">
-                    <div class="water" id="water-level"></div>
-                </div>
-                <div class="info">
-                    <p>M³ actuales: <span id="m3">67.298</span> m³</p>
-                    <p>Litros actuales: <span id="liters">67298</span> litros</p>
-                    <p>Contador ON/OFF Bomba: <span id="pump-counter">0</span></p>
-                </div>
+            <div class="pipe-pump">
+                <div class="pump-icon"></div>
             </div>
-            <div class="slider-container">
-                <input type="range" class="slider" id="level-slider" min="0" max="443730" value="67298">
-            </div>
-            <div class="right-section">
-                <div class="chart-container">
-                    <canvas id="levelChart"></canvas>
-                </div>
-                <div class="controls" id="simulation-controls">
-                    <button id="pump-toggle">Simular Bomba ON</button>
-                    <button id="reset-counter">Reset Contador</button>
-                </div>
-                <div class="alert" id="alarm">¡Alarma! Nivel bajo en Depósito 1 - 15.2% <br>
-                    <a href="mailto:?subject=Alarma%20Depósito%201&body=Nivel%20bajo:%2015.2%" target="_blank">Enviar Email</a> | 
-                    <a href="https://wa.me/?text=Alarma%20Depósito%201:%20Nivel%20bajo%2015.2%" target="_blank">Enviar WhatsApp</a> | 
-                    <span>Simular SMS (no real, configúralo manualmente)</span>
-                </div>
+            <div class="tank">
+                <div class="water"></div>
             </div>
         </div>
     </div>
-
-    <script>
-        const totalLiters = 443730; // Capacidad total inicial en litros
-        const tank = document.getElementById("water-level");
-        const m3Display = document.getElementById("m3");
-        const litersDisplay = document.getElementById("liters");
-        const slider = document.getElementById("level-slider");
-        const pipePump = document.getElementById("pipe-pump");
-        const pumpIcon = document.getElementById("pump-icon");
-        const pumpToggle = document.getElementById("pump-toggle");
-        const pumpCounterDisplay = document.getElementById("pump-counter");
-        const resetCounter = document.getElementById("reset-counter");
-        const simulationControls = document.getElementById("simulation-controls");
-        const alarm = document.getElementById("alarm");
-        const ctx = document.getElementById('levelChart').getContext('2d');
-
-        // Actualizar el nivel del tanque y los valores según el slider
-        let currentCapacity = totalLiters;
-        slider.addEventListener("input", function() {
-            const liters = parseInt(slider.value);
-            const percentage = (liters / currentCapacity) * 100;
-            const m3 = (liters / 1000).toFixed(3);
-            updateTank(liters, percentage, m3);
-            checkAlarm(percentage);
-        });
-
-        function updateTank(liters, percentage, m3) {
-            tank.style.height = percentage + "%";
-            m3Display.textContent = m3;
-            litersDisplay.textContent = liters;
-            updateWaterColor(percentage);
-            updateChart(m3);
-        }
-
-        // Colores del agua según rangos
-        const defaultColors = {
-            100: '#00008B',
-            75: '#ADD8E6',
-            50: '#FFA500',
-            25: '#FFFF00',
-            15: '#FFB6C1'
-        };
-
-        function updateWaterColor(percentage) {
-            if (percentage >= 75) tank.style.backgroundColor = defaultColors[100];
-            else if (percentage >= 50) tank.style.backgroundColor = defaultColors[75];
-            else if (percentage >= 25) tank.style.backgroundColor = defaultColors[50];
-            else if (percentage > 15) tank.style.backgroundColor = defaultColors[25];
-            else tank.style.backgroundColor = defaultColors[15];
-        }
-
-        // Simular ON/OFF de la bomba y alternar entre on1 y on2 para movimiento
-        let pumpOn = false;
-        let pumpCounter = 0;
-        let pumpState = 1; // 1 para on1, 2 para on2
-
-        pumpToggle.addEventListener("click", function() {
-            pumpOn = !pumpOn;
-            if (pumpOn) {
-                pipePump.style.backgroundColor = "blue"; // Tubo azul para indicar agua
-                simulatePumpMovement();
-                pumpToggle.textContent = "Simular Bomba OFF";
-            } else {
-                pipePump.style.backgroundColor = "white"; // Tubo blanco para detenido
-                pumpIcon.style.backgroundImage = `url('URL_BOMBA_STOP')`;
-                clearInterval(pumpAnimation);
-                pumpToggle.textContent = "Simular Bomba ON";
-            }
-            pumpCounter++;
-            pumpCounterDisplay.textContent = pumpCounter;
-        });
-
-        // Simular movimiento alternando entre on1 y on2
-        let pumpAnimation;
-        function simulatePumpMovement() {
-            pumpAnimation = setInterval(() => {
-                pumpState = pumpState === 1 ? 2 : 1;
-                if (pumpState === 1) {
-                    pumpIcon.style.backgroundImage = `url('URL_BOMBA_ON1')`;
-                } else {
-                    pumpIcon.style.backgroundImage = `url('URL_BOMBA_ON2')`;
-                }
-            }, 500); // Cambia cada 0.5 segundos para simular movimiento
-        }
-
-        // Resetear contador de ON/OFF
-        resetCounter.addEventListener("click", function() {
-            pumpCounter = 0;
-            pumpCounterDisplay.textContent = pumpCounter;
-            if (!pumpOn) {
-                pumpIcon.style.backgroundImage = `url('URL_BOMBA_STOP')`;
-            }
-        });
-
-        // Alarma fija para nivel bajo (15.2%)
-        let alarmThreshold = 15;
-        function checkAlarm(percentage) {
-            if (percentage <= alarmThreshold) {
-                alarm.style.display = "block";
-                tank.classList.add("blink");
-            } else {
-                alarm.style.display = "none";
-                tank.classList.remove("blink");
-            }
-        }
-
-        // Gráfico simulado en m³
-        let chart;
-        const labels = ['Día 1', 'Día 2', 'Día 3', 'Día 4', 'Día 5', 'Día 6', 'Día 7', 'Día 8', 'Día 9', 'Día 10'];
-        const data = {
-            labels: labels,
-            datasets: [{
-                label: 'Nivel de agua (m³)',
-                data: [443.73, 400.00, 350.00, 300.00, 250.00, 200.00, 150.00, 100.00, 80.00, 67.298],
-                borderColor: 'rgba(0, 150, 136, 1)',
-                backgroundColor: 'rgba(0, 150, 136, 0.2)',
-                fill: true
-            }]
-        };
-
-        chart = new Chart(ctx, {
-            type: 'line',
-            data: data,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: { y: { beginAtZero: true, max: 443.73, title: { display: true, text: 'Nivel de agua (m³)' } } }
-            }
-        });
-
-        function updateChart(m3) {
-            chart.data.datasets[0].data.shift();
-            chart.data.datasets[0].data.push(parseFloat(m3));
-            chart.update();
-        }
-
-        // Inicializar el tanque al 15.2%
-        slider.value = 67298;
-        slider.dispatchEvent(new Event("input"));
-        pipePump.style.backgroundColor = "white";
-        pumpIcon.style.backgroundImage = `url('URL_BOMBA_STOP')`;
-        pumpToggle.textContent = "Simular Bomba ON";
-        pumpCounterDisplay.textContent = pumpCounter;
-        simulationControls.style.display = "block";
-        checkAlarm(15.2);
-    </script>
 </body>
 </html>
