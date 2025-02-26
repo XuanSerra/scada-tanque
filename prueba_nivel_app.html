@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Nivel de Agua con App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            width: 400px;
+        }
+        .frame {
+            border: 2px solid #333;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        #liters {
+            font-size: 24px;
+            color: #0066cc;
+            font-weight: bold;
+        }
+        .input-group {
+            margin-top: 10px;
+        }
+        input {
+            padding: 5px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Depósito 1 - Nivel con App</h2>
+        <div class="frame">
+            <p>Litros teóricos: <span id="liters">0</span></p>
+        </div>
+        <div class="input-group">
+            <input type="number" id="maInput" placeholder="Ingresa mA (0-20)" step="0.001">
+            <button onclick="updateLiters()">Actualizar</button>
+        </div>
+    </div>
+
+    <script>
+        const totalLiters = 443730; // Capacidad total en litros
+        const litersDisplay = document.getElementById("liters");
+        const maInput = document.getElementById("maInput");
+
+        // Convertir mA a litros
+        function maToLiters(ma) {
+            if (ma < 4) return 0; // Menor a 4 mA = 0 litros
+            if (ma > 20) ma = 20; // Máximo 20 mA
+            const meters = (ma - 4) * (3 / 16); // mA a metros (4-20 mA = 0-3 m)
+            const liters = meters * (totalLiters / 3); // Metros a litros
+            return Math.round(liters); // Redondear
+        }
+
+        // Actualizar litros manualmente
+        function updateLiters() {
+            const ma = parseFloat(maInput.value) || 0;
+            const liters = maToLiters(ma);
+            litersDisplay.textContent = liters;
+            console.log(`mA: ${ma}, Litros: ${liters}`);
+        }
+
+        // Iniciar con el valor de la app (0.008 mA)
+        updateLiters(); // Empieza con 0 litros por ser < 4 mA
+    </script>
+</body>
+</html>
