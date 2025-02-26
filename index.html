@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Nivel de Agua en Tiempo Real</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            width: 400px;
+        }
+        .frame {
+            border: 2px solid #333;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #liters {
+            font-size: 24px;
+            color: #0066cc;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Depósito 1 - Nivel en Tiempo Real</h2>
+        <div class="frame">
+            <p>Litros teóricos: <span id="liters">Cargando...</span></p>
+        </div>
+    </div>
+
+    <script>
+        const totalLiters = 443730; // Capacidad total en litros
+        const litersDisplay = document.getElementById("liters");
+
+        // Simular recepción de Webhook (reemplazar con servidor real)
+        function simulateWebhook() {
+            // Simulamos con 5.003 mA como ejemplo, cambiará con datos reales
+            let channel1MA = 5.003; // Valor inicial, se actualizará con el generador
+
+            // Convertir mA a litros
+            function maToLiters(ma) {
+                if (ma < 4) ma = 4; // Mínimo 4 mA
+                if (ma > 20) ma = 20; // Máximo 20 mA
+                const meters = (ma - 4) * (3 / 16); // mA a metros (4-20 mA = 0-3 m)
+                const liters = meters * (totalLiters / 3); // Metros a litros
+                return Math.round(liters); // Redondear para que sea fácil de leer
+            }
+
+            // Actualizar litros
+            const liters = maToLiters(channel1MA);
+            litersDisplay.textContent = liters;
+
+            // Simulación cada segundo (ajustar a 5 minutos después)
+            setTimeout(simulateWebhook, 1000);
+        }
+
+        // Iniciar simulación
+        simulateWebhook();
+
+        // Para datos reales desde Webhook.site (cuando configures un servidor)
+        window.addEventListener('message', function(event) {
+            try {
+                const data = JSON.parse(event.data);
+                let channel1MA = null;
+                data.measurementsEvents.forEach(channel => {
+                    if (channel.channelNumber === 1) {
+                        channel1MA = channel.events[0].value;
+                    }
+                });
+                if (channel1MA !== null) {
+                    const liters = maToLiters(channel1MA);
+                    litersDisplay.textContent = liters;
+                    console.log(`Canal 1: ${channel1MA} mA, ${liters} litros`);
+                }
+            } catch (error) {
+                console.error('Error procesando Webhook:', error);
+            }
+        });
+    </script>
+</body>
+</html>
