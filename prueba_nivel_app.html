@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prueba Nivel de Agua con App</title>
+    <title>Prueba Nivel de Agua en Tiempo Real</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -31,6 +31,19 @@
             color: #0066cc;
             font-weight: bold;
         }
+        .timer {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        #timer-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #4CAF50;
+            border-radius: 5px;
+            transition: width 1s linear;
+        }
         .input-group {
             margin-top: 10px;
         }
@@ -48,9 +61,12 @@
 </head>
 <body>
     <div class="container">
-        <h2>Depósito 1 - Nivel con App</h2>
+        <h2>Depósito 1 - Nivel en Tiempo Real</h2>
         <div class="frame">
-            <p>Litros teóricos: <span id="liters">0</span></p>
+            <p>Litros teóricos: <span id="liters">Cargando...</span></p>
+        </div>
+        <div class="timer">
+            <div id="timer-bar"></div>
         </div>
         <div class="input-group">
             <input type="number" id="maInput" placeholder="Ingresa mA (0-20)" step="0.001">
@@ -61,7 +77,25 @@
     <script>
         const totalLiters = 443730; // Capacidad total en litros
         const litersDisplay = document.getElementById("liters");
+        const timerBar = document.getElementById("timer-bar");
         const maInput = document.getElementById("maInput");
+
+        // Configurar tiempo (5 minutos = 300 segundos)
+        let timeLeft = 300; // 5 minutos en segundos
+        const timerInterval = setInterval(updateTimer, 1000);
+
+        // Actualizar barra de tiempo
+        function updateTimer() {
+            timeLeft--;
+            const width = (timeLeft / 300) * 100; // Porcentaje restante
+            timerBar.style.width = width + "%";
+
+            if (timeLeft <= 0) {
+                timeLeft = 300; // Reiniciar a 5 minutos
+                timerBar.style.width = "100%";
+                console.log("Tiempo reiniciado, pero sin datos nuevos");
+            }
+        }
 
         // Convertir mA a litros
         function maToLiters(ma) {
@@ -78,10 +112,44 @@
             const liters = maToLiters(ma);
             litersDisplay.textContent = liters;
             console.log(`mA: ${ma}, Litros: ${liters}`);
+            timeLeft = 300; // Reiniciar timer al actualizar
+            timerBar.style.width = "100%";
         }
 
-        // Iniciar con el valor de la app (0.008 mA)
-        updateLiters(); // Empieza con 0 litros por ser < 4 mA
+        // Iniciar con el último valor conocido (5.003 mA del JSON)
+        let lastMA = 5.003; // Valor del JSON más reciente
+        litersDisplay.textContent = maToLiters(lastMA);
+
+        // Simular actualización cada 5 minutos con el último JSON
+        setInterval(() => {
+            litersDisplay.textContent = maToLiters(lastMA); // Mantener último valor
+            timeLeft = 300; // Reiniciar timer
+            timerBar.style.width = "100%";
+            console.log(`Simulación: ${lastMA} mA, ${maToLiters(lastMA)} litros`);
+        }, 300000); // 5 minutos
+
+        // Para datos reales desde Webhook.site (cuando configures un servidor)
+        window.addEventListener('message', function(event) {
+            try {
+                const data = JSON.parse(event.data);
+                let channel1MA = null;
+                data.measurementsEvents.forEach(channel => {
+                    if (channel.channelNumber === 1) {
+                        channel1MA = channel.events[0].value;
+                    }
+                });
+                if (channel1MA !== null) {
+                    lastMA = channel1MA;
+                    const liters = maToLiters(channel1MA);
+                    litersDisplay.textContent = liters;
+                    console.log(`Canal 1: ${channel1MA} mA, ${liters} litros`);
+                    timeLeft = 300; // Reiniciar timer con datos reales
+                    timerBar.style.width = "100%";
+                }
+            } catch (error) {
+                console.error('Error procesando Webhook:', error);
+            }
+        });
     </script>
 </body>
 </html>
